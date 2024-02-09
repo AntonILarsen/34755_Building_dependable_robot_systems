@@ -1,1 +1,1 @@
-hva så bøgser?
+hva så bøgser? ja tak
