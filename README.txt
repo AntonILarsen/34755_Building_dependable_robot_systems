@@ -1,1 +1,0 @@
-hva så bøgser?
