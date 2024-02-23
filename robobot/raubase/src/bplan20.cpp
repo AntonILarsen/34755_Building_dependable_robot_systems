@@ -97,11 +97,11 @@ void BPlan20::run()
       mixer.setVelocity(0.5);
       tolog("Distance_Sensor_Go: %d", dist[0]);
 
-      if (dist[0] < 900000)
+      if (dist[0] < 0.2)
       {
         bool nogate = true;
       }
-      if (dist[0] > 900000 &nogate = true) // gate detected (guess of sensor value at gate.)
+      if (dist[0] > 0.2 &nogate = true) // gate detected (guess of sensor value at gate.)
       {
         passedgates += 1;
         nogate = false;
@@ -113,7 +113,7 @@ void BPlan20::run()
       }
       if (t.getTimePassed() >= firstgatetime + 4)
       { // få styr på tidsenheden.
-        if (dist[0] > 90000)
+        if (dist[0] > 0.2)
         {
           OnTrack = true;
         }
@@ -123,7 +123,7 @@ void BPlan20::run()
           mixer.setVelocity(0);
           tolog("distance sensor: %d", dist[0])
         }
-        if (dist[0] > 90000)
+        if (dist[0] > 0.2)
         {
           OnTrack = true;
           mixer.setVelocity(0.5);
