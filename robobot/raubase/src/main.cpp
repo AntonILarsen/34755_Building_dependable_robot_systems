@@ -33,6 +33,7 @@
 #include "sgpiod.h"
 #include "bplan20.h"
 #include "bplan21.h"
+#include "bplan30.h"
 #include "bplan40.h"
 #include "bplan100.h"
 #include "bplan101.h"
@@ -48,11 +49,13 @@ int main (int argc, char **argv)
     // turn on LED on port 16
     gpio.setPin(16, 1);
     // run the planned missions
-    plan20.run();
-    plan21.run();
-    plan40.run();
-    plan100.run();
-    plan101.run();
+    plan20.run(); //guillotine
+    plan21.run(); // stairs
+    plan30.run(); // seesaw
+    plan40.run(); //tunnel
+    plan100.run(); //axe
+    plan101.run(); //regbot and spin
+    plan200.run(); //speedrun and goal
     //
     mixer.setVelocity(0.0);
     mixer.setTurnrate(0.0);
