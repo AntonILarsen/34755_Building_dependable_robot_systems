@@ -93,7 +93,7 @@ void BPlan20::run()
     { // make a shift in heading-mission
     case 10:
       pose.resetPose();
-      mixer.setEdgeMode(rightEdge, 0); // 0 offset.
+      mixer.setEdgeMode(False, 0); // 0 offset.
       mixer.setVelocity(0.5);
       tolog("Distance_Sensor_Go: %d", dist[0]);
 
