@@ -1,25 +1,25 @@
-/*  
- * 
+/*
+ *
  * Copyright © 2023 DTU,
  * Author:
  * Christian Andersen jcan@dtu.dk
- * 
+ *
  * The MIT License (MIT)  https://mit-license.org/
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
- * and associated documentation files (the “Software”), to deal in the Software without restriction, 
- * including without limitation the rights to use, copy, modify, merge, publish, distribute, 
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software 
+ * and associated documentation files (the “Software”), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
  * is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies 
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
  * or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE. */
 
 #include <string>
@@ -41,7 +41,6 @@
 
 // create class object
 BPlan20 plan20;
-
 
 void BPlan20::setup()
 { // ensure there is default values in ini-file
@@ -71,7 +70,6 @@ BPlan20::~BPlan20()
   terminate();
 }
 
-
 void BPlan20::run()
 {
   if (not setupDone)
@@ -84,6 +82,8 @@ void BPlan20::run()
   bool lost = false;
   state = 10;
   oldstate = state;
+  int passedgates = 0;
+  bool OnTrack1 = true;
   //
   toLog("Plan20 started");
   //
@@ -91,24 +91,67 @@ void BPlan20::run()
   {
     switch (state)
     { // make a shift in heading-mission
-      case 10:
-        pose.resetPose();
-        toLog("forward at 0.3m/s");
-        mixer.setVelocity(0.3);
-        state = 11;
-        break;
-      case 11: // wait for distance
-        if (pose.dist >= 1.0)
-        { // done, and then
-          finished = true;
+    case 10:
+      pose.resetPose();
+      mixer.setEdgeMode(rightEdge, 0); // 0 offset.
+      mixer.setVelocity(0.5);
+      tolog("Distance_Sensor_Go: %d", dist[0]);
+
+      if (dist[0] < 900000)
+      {
+        bool nogate = true;
+      }
+      if (dist[0] > 900000 &nogate = true) // gate detected (guess of sensor value at gate.)
+      {
+        passedgates += 1;
+        nogate = false;
+        if passedgates
+          = 1
+          {
+            int firstgatetime = t.getTimePassed();
+          }
+      }
+      if (t.getTimePassed() >= firstgatetime + 4)
+      { // få styr på tidsenheden.
+        if (dist[0] > 90000)
+        {
+          OnTrack = true;
         }
-        else if (t.getTimePassed() > 10)
-          lost = true;
-        break;
-      default:
-        toLog("Unknown state");
+
+        while (t.getTimePassed < firstgatetime + 6)
+        {
+          mixer.setVelocity(0);
+          tolog("distance sensor: %d", dist[0])
+        }
+        if (dist[0] > 90000)
+        {
+          OnTrack = true;
+          mixer.setVelocity(0.5);
+        }
+        else
+          On Track = false;
+        state 12;
+      }
+
+      if (passedgates = 3)
+      {
+        state = 11;
+      }
+
+      break;
+    case 11: // wait for distance
+      if (pose.dist >= 1.0)
+      { // done, and then
+        finished = true;
+      }
+      else if (t.getTimePassed() > 10)
         lost = true;
-        break;
+      break;
+    default:
+      toLog("Unknown state");
+      lost = true;
+      break;
+    case 12:
     }
     if (state != oldstate)
     {
@@ -130,7 +173,6 @@ void BPlan20::run()
     toLog("Plan20 finished");
 }
 
-
 void BPlan20::terminate()
 { //
   if (logfile != nullptr)
@@ -138,20 +180,19 @@ void BPlan20::terminate()
   logfile = nullptr;
 }
 
-void BPlan20::toLog(const char* message)
+void BPlan20::toLog(const char *message)
 {
   UTime t("now");
   if (logfile != nullptr)
   {
-    fprintf(logfile, "%lu.%04ld %d %% %s\n", t.getSec(), t.getMicrosec()/100,
+    fprintf(logfile, "%lu.%04ld %d %% %s\n", t.getSec(), t.getMicrosec() / 100,
             oldstate,
             message);
   }
   if (toConsole)
   {
-    printf("%lu.%04ld %d %% %s\n", t.getSec(), t.getMicrosec()/100,
+    printf("%lu.%04ld %d %% %s\n", t.getSec(), t.getMicrosec() / 100,
            oldstate,
            message);
   }
 }
-
