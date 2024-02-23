@@ -151,7 +151,13 @@ void BPlan20::run()
       toLog("Unknown state");
       lost = true;
       break;
-    case 12:
+    case 12: //stepbro drives backwards for 6 secodns, assuming it can follow the line while driving backwards.
+      mixer.setVelocity(-0.5) 
+          int thirdgatepassed = t.getTimePassed();
+      if (t.getTimePassed < thirdgatepassed + 6)
+      {
+          finished = true;
+      }
     }
     if (state != oldstate)
     {
