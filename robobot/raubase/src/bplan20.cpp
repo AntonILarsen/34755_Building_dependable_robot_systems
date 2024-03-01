@@ -135,17 +135,15 @@ void BPlan20::run()
 
       if (passedgates = 3)
       {
-        state = 11;
+        state = 12;
       }
 
       break;
     case 11: // wait for distance
-      if (pose.dist >= 1.0)
-      { // done, and then
-        finished = true;
-      }
-      else if (t.getTimePassed() > 10)
-        lost = true;
+        mixer.setEdgeMode(False, 0); // 0 offset.
+        mixer.setVelocity(0.5);
+        tolog("Distance_Sensor_Go: %d", dist[0]);
+     
       break;
     default:
       toLog("Unknown state");

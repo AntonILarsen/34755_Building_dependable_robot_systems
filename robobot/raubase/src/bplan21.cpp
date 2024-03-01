@@ -88,7 +88,7 @@ void BPlan21::run()
   int turns = 0;
   //
   while (not finished and not lost and not service.stop)
-  { // run a square with 4 90 deg turns - CCV
+  { // Get in pos for stairs and then transform. Drive straight down the stairs.
     switch (state)
     {
       case 10:
