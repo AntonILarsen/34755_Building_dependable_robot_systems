@@ -30,6 +30,8 @@ float gz_offset = 0;
 #define CNT_MAX 30/T_ISR
 //#define CAL_MAG 1
 unsigned long t1 = 0;
+uint8_t rasp_pin = 34;
+uint8_t rasp_on=0;
 uint8_t enA = 14, in1 = 27, in2 = 26; // enA -> pwm_pin = 4; dir_pin = 16,
 uint8_t encoder1 = 32, encoder2 = 33;
 ESP32Encoder encoder;
@@ -48,6 +50,7 @@ void setup()
   //pinMode(dir_pin, OUTPUT);
   //pinMode(in2_pin, OUTPUT);
   //ledcSetup(0,PWM_FREQ,8);
+  pinMode(rasp_pin, INPUT);
   pinMode(enA, OUTPUT);// ledcSetup(0,PWM_FREQ,8); // B4
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
@@ -93,11 +96,17 @@ void update(){
   }
   */
   
-  if(t >= 10){
+  /*if(t >= 10){
     t = 0;
-    set_cnt= (set_cnt == 0) ? 1.5*  4*800 : 0; //2*CNT_ROT : 0;
+    set_cnt= (set_cnt == 0) ? 3*  4*800 : 0; //2*CNT_ROT : 0;
   }
-
+  */
+  rasp_on=digitalRead(rasp_pin);
+  if(rasp_on){
+    set_cnt=3*4*800;
+  }else{
+    set_cnt=0;
+  }
   
   int32_t cnt_n = (int32_t)encoder.getCount();
   static int32_t cnt_p = cnt_n;
@@ -107,7 +116,7 @@ void update(){
   //float u = pictrl(e,0.45*0.35,0.85*0.08,T_ISR);
   float u = pictrl(e,0.1*0.08,4*0.15,T_ISR);
   Serial.print(e); Serial.print("\t"); Serial.print(cnt_n); Serial.print("\t"); Serial.print(set_cnt); Serial.print("\t"); Serial.println(u);
-  if(u < 0){
+  if(u < 0){ //
     //digitalWrite(dir_pin,1);
     digitalWrite(in1, HIGH);
     digitalWrite(in2, LOW);
@@ -116,6 +125,7 @@ void update(){
     	digitalWrite(in1, LOW);
       digitalWrite(in2, HIGH);
   }
+  
   u = abs(u)*255.0/12;
   if(u > 255){
     u = 255;
