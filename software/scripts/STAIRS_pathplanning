@@ -1,0 +1,28 @@
+int numStairs=5;
+for (int i = 1; i <= numStairs; i++) { 
+gpio.setPin(12,0); //
+mixer.setVelocity(1);
+sleep(4);
+gpio.setPin(12,1);
+sleep(3);
+gpio.setPin(12,0);
+sleep(2);
+mixer.setVelocity(0);//står ved næste trin
+driveDist(0.1,-0.3);//drive in position for take off
+}
+
+
+void driveDist(double DISTANCE, double VELOCITY){ 
+while (not finished and not lost and not service.stop)
+{
+    if (pose.dist >= DISTANCE) // in meters
+    {
+        mixer.setVelocity(0.0);
+        break;
+    }
+    else
+    {
+        mixer.setVelocity(VELOCITY); // set to 0
+    }
+}
+}
