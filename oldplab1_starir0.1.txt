@@ -1,0 +1,148 @@
+
+
+/*  
+ * 
+ * Copyright © 2023 DTU,
+ * Author:
+ * Christian Andersen jcan@dtu.dk
+ * 
+ * The MIT License (MIT)  https://mit-license.org/
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the “Software”), to deal in the Software without restriction, 
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute, 
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software 
+ * is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies 
+ * or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+ * THE SOFTWARE. */
+
+#include <string>
+#include <string.h>
+#include <math.h>
+#include <unistd.h>
+#include "mpose.h"
+#include "steensy.h"
+#include "uservice.h"
+#include "sencoder.h"
+#include "utime.h"
+#include "cmotor.h"
+#include "cservo.h"
+#include "medge.h"
+#include "cedge.h"
+#include "cmixer.h"
+#include "sgpiod.h"
+#include "bplan1.h"
+
+// create class object
+BPlan1 plan1;
+
+// Nicolai tester
+void BPlan1::setup() 
+{ 
+// ANTON SETUP
+servo.setup();
+
+
+
+// ensure there is default values in ini-file
+  if (not ini["plan1"].has("log"))
+  { // no data yet, so generate some default values
+    ini["plan1"]["log"] = "true";
+    ini["plan1"]["run"] = "false";
+    ini["plan1"]["print"] = "true";
+  }
+  // get values from ini-file
+  toConsole = ini["plan1"]["print"] == "true";
+  //
+  if (ini["plan1"]["log"] == "true")
+  { // open logfile
+    std::string fn = service.logPath + "log_plan1.txt";
+    logfile = fopen(fn.c_str(), "w");
+    fprintf(logfile, "%% Mission plan1 logfile\n");
+    fprintf(logfile, "%% 1 \tTime (sec)\n");
+    fprintf(logfile, "%% 2 \tMission state\n");
+    fprintf(logfile, "%% 3 \t%% Mission status (mostly for debug)\n");
+  }
+  setupDone = true;
+}
+
+BPlan1::~BPlan1()
+{
+  terminate();
+}
+
+
+void BPlan1::run()
+{
+//Wrtie plan here
+//gpio.setPin(12,0);
+//mixer.setVelocity(1);
+
+//gpio.setPin(12,1);
+//sleep(3);
+//gpio.setPin(12,0);
+//sleep(3); hshs
+int numStairs=5;
+gpio.setPin(12,0);
+cout << "HhhhEJ\n";
+
+for (int i = 1; i <= numStairs; i++) { 
+
+//gpio.setPin(12,0);
+//mixer.setVelocity(1);
+sleep(2);
+gpio.setPin(12,1);
+sleep(3);
+gpio.setPin(12,0);
+sleep(2);
+//mixer.setVelocity(0);//står ved næste trin
+sleep(2);
+
+//while(not finished and not lost and not service.stop){
+pose.dist=0;
+	while(1){
+	if(pose.dist<=-0.09){
+		mixer.setVelocity(0.0);
+		break;
+	}else{
+		mixer.setVelocity(-0.1);
+	}
+
+}
+}
+
+}
+
+
+void BPlan1::terminate()
+{ //
+  if (logfile != nullptr)
+    fclose(logfile);
+  logfile = nullptr;
+}
+
+void BPlan1::toLog(const char* message)
+{
+  UTime t("now");
+  if (logfile != nullptr)
+  {
+    fprintf(logfile, "%lu.%04ld %d %% %s\n", t.getSec(), t.getMicrosec()/100,
+            oldstate,
+            message);
+  }
+  if (toConsole)
+  {
+    printf("%lu.%04ld %d %% %s\n", t.getSec(), t.getMicrosec()/100,
+           oldstate,
+           message);
+  }
+}
+
