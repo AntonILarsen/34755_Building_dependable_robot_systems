@@ -11,16 +11,17 @@ void setup_imu() {
   imu.beginMag();
 }
 
-uint8_t get_acc(){
-    return (imu.accelUpdate() == 0 ? 1 : 0);
+void get_acc(acc* ac){
+  imu.accelUpdate();
+  ac->ax = imu.accelX();
+  ac->ay = imu.accelY();
+  ac->az = imu.accelZ();
 }
-gyr get_gyr(){
-  gyr gr;
+void get_gyr(gyr* gr){
   imu.gyroUpdate();
-  gr.gx = imu.gyroX();
-  gr.gy = imu.gyroY();
-  gr.gz = imu.gyroZ();
-  return gr;
+  gr->gx = imu.gyroX();
+  gr->gy = imu.gyroY();
+  gr->gz = imu.gyroZ();
 }
 mag get_mag(){
   mag mg;
@@ -30,27 +31,25 @@ mag get_mag(){
   mg.mz = imu.magZ();
   return mg;
 }
-float cal_gyr_offset(uint8_t axis){
-  float data[300];
-  for(int i = 0; i < 300; i++){
-    gyr gr = get_gyr();
-    if(axis == XAXIS){
-      data[i] = gr.gx;
-    }else if(axis == YAXIS){
-      data[i] = gr.gy;
-    }else if(axis == ZAXIS){
-      data[i] = gr.gz;
-    }else{
-      return -3000;
-    }
+void cal_gyr_offset(gyr* gr){
+  const int N = 300;
+  float data[3][N];
+  for(int i = 0; i < N; i++){
+    get_gyr(gr);
+    data[0][i] = gr->gx;
+    data[1][i] = gr->gy;
+    data[2][i] = gr->gz;
     delay(10);
   }
-  float offset = 0;
-  for(int i = 0; i < 300; i++){
-    offset+= data[i];
+  float offset[3] = {0,0,0};
+  for(int i = 0; i < N; i++){
+    offset[0]+= data[0][i];
+    offset[1]+= data[1][i];
+    offset[2]+= data[2][i];
   }
-  offset = offset/300;
-  return offset;
+  gr->gxo = offset[0]/N;
+  gr->gyo = offset[1]/N;
+  gr->gzo = offset[2]/N;
 }
 void sample_mag(){
   mag mg;
@@ -60,4 +59,3 @@ void sample_mag(){
     delay(15);
   }
 }
-
