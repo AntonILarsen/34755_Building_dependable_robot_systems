@@ -36,7 +36,7 @@
 #define TAUD 0.07
 #define ALPHA 0.15
 #define LOCAL_REF 0
-#define TAU_CPF 0.0
+#define TAU_CPF 0.5
 #define DEBUG 0
 uint8_t isr_flag = 0;
 uint8_t enA = 14, in1 = 27, in2 = 26; 
